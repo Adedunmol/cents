@@ -49,12 +49,11 @@ const createClient = async (req, res) => {
     return res.status(StatusCodes.CREATED).json(result)
 }
 
+
 const deleteClient = async (req, res) => {
     const createdBy = req.id
     const { id: clientID } = req.params
 
-    console.log(`createdBy: ${createdBy}`)
-    console.log(`ClientID: ${clientID}`)
     if (!clientID) {
         throw new BadRequestError('No id with URL')
     }
@@ -69,9 +68,45 @@ const deleteClient = async (req, res) => {
     return res.status(StatusCodes.OK).json({ message: 'Client has been deleted' })
 }
 
+
+const updateClient = async (req, res) => {
+    const createdBy = req.id
+    const { id: clientID } = req.params
+    const { fullName, email, phoneNumber } = req.body
+
+    if (!clientID) {
+        throw new BadRequestError('No id with URL')
+    }
+
+    const invoices = await Invoice.find({ createdFor: clientID, createdBy }).exec()
+    const client = await Client.findOne({ createdBy, _id: clientID }).exec()
+
+    const newInvoices = invoices.forEach(invoice => {
+        invoice.clientFullName = fullName || client.fullName
+        invoice.clientEmail = email || client.email
+        invoice.clientPhoneNumber = phoneNumber || client.phoneNumber
+    })
+    
+    client.fullName = fullName || client.fullName
+    client.email = email || client.email
+    client.phoneNumber = phoneNumber || client.phoneNumber
+
+    const clientResult = await client.save()
+
+    if (!newInvoices) {
+        //there are no invoices associated with the client 
+    }else {
+        const invoiceResult = await newInvoices.save()
+    }
+
+    return res.status(StatusCodes.OK).json(clientResult)
+}
+
+
 module.exports = {
     getClient,
     createClient,
     getAllClients,
-    deleteClient
+    deleteClient,
+    updateClient
 }

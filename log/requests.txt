@@ -244,3 +244,33 @@ undefined: DELETE /api/v1/clients/627e0409bbb9837f233193e9
 
 undefined: DELETE /api/v1/clients/627e0409bbb9837f233193e9
 
+undefined: GET /api/v1/auth/refresh-token
+
+undefined: POST /api/v1/clients
+
+undefined: PATCH /api/v1/clients/627ea417361a963f3ac6d986
+
+undefined: PATCH /api/v1/clients/627ea417361a963f3ac6d986
+
+undefined: PATCH /api/v1/clients/627ea417361a963f3ac6d986
+
+undefined: PATCH /api/v1/clients/627ea417361a963f3ac6d986
+
+undefined: PATCH /api/v1/clients/627ea417361a963f3ac6d986
+
+undefined: PATCH /api/v1/clients/627ea417361a963f3ac6d986
+
+undefined: PATCH /api/v1/clients/627ea417361a963f3ac6d986
+
+undefined: PATCH /api/v1/clients/627ea417361a963f3ac6d986
+
+undefined: PATCH /api/v1/clients/627ea417361a963f3ac6d986
+
+undefined: PATCH /api/v1/clients/627ea417361a963f3ac6d986
+
+undefined: PATCH /api/v1/clients/627ea417361a963f3ac6d986
+
+undefined: PATCH /api/v1/clients/627ea417361a963f3ac6d986
+
+undefined: PATCH /api/v1/clients/627ea417361a963f3ac6d986
+
