@@ -15,6 +15,7 @@ const rateLimiter = require('express-rate-limit')
 const cors = require('cors')
 const xss = require('xss-clean')
 const verifyJWT = require('./middlewares/verifyJWT')
+const verifyMailConfirmed = require('./middlewares/verifyMailConfirmed')
 const authRouter = require('./routes/auth')
 const clientRouter = require('./routes/client')
 const { UnauthorizedError } = require('./errors')
@@ -37,6 +38,7 @@ app.use(xss())
 app.use('/api/v1/auth', authRouter)
 
 app.use(verifyJWT)
+app.use(verifyMailConfirmed)
 app.use('/api/v1/clients', clientRouter)
 
 app.get('/', (req, res) => {

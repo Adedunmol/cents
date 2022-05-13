@@ -208,3 +208,39 @@ undefined: GET /api/v1/clients/627e0409bbb9837f233193e9
 
 undefined: GET /api/v1/clients/627e0409bbb9837f233193e9
 
+undefined: GET /api/v1/clients/627e0409bbb9837f233193e9
+
+undefined: GET /api/v1/auth/refresh-token
+
+undefined: GET /api/v1/auth/resend-confirmation-mail
+
+undefined: GET /api/v1/auth/confirm-mail/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im95ZXdhbGVhZGVkdW5tb2xhQGdtYWlsLmNvbSIsImlhdCI6MTY1MjQ2MDQ0OSwiZXhwIjoxNjUyNDYxMzQ5fQ.5uGbI2M3mS7-UPhVjyoj8izLvlpd-wyaXQQZ8Vlj3BY
+
+undefined: GET /api/v1/auth/confirm-mail/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im95ZXdhbGVhZGVkdW5tb2xhQGdtYWlsLmNvbSIsImlhdCI6MTY1MjQ2MDQ0OSwiZXhwIjoxNjUyNDYxMzQ5fQ.5uGbI2M3mS7-UPhVjyoj8izLvlpd-wyaXQQZ8Vlj3BY
+
+undefined: GET /api/v1/auth/confirm-mail/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im95ZXdhbGVhZGVkdW5tb2xhQGdtYWlsLmNvbSIsImlhdCI6MTY1MjQ2MDQ0OSwiZXhwIjoxNjUyNDYxMzQ5fQ.5uGbI2M3mS7-UPhVjyoj8izLvlpd-wyaXQQZ8Vlj3BY
+
+undefined: GET /api/v1/clients/
+
+undefined: GET /api/v1/clients/627e0409bbb9837f233193e9
+
+undefined: GET /api/v1/clients/
+
+undefined: DELETE /api/v1/clients/627e0409bbb9837f233193e9
+
+undefined: DELETE /api/v1/clients/627e0409bbb9837f233193e9
+
+undefined: DELETE /api/v1/clients/627e0409bbb9837f233193e9
+
+undefined: GET /api/v1/clients/
+
+undefined: DELETE /api/v1/clients/627e0409bbb9837f233193e9
+
+undefined: DELETE /api/v1/clients/627e0409bbb9837f233193e9
+
+undefined: DELETE /api/v1/clients/627e0409bbb9837f233193e9
+
+undefined: DELETE /api/v1/clients/627e0409bbb9837f233193e9
+
+undefined: DELETE /api/v1/clients/627e0409bbb9837f233193e9
+

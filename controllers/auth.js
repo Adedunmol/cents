@@ -275,9 +275,9 @@ const confirmMail = async (req, res) => {
             if (err) {
                 return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Bad token' })
             }
-            const username = data.username
+            const email = data.email
 
-            const user = await User.findOne({ username }).exec()
+            const user = await User.findOne({ email }).exec()
 
             if (!user) {
                 throw new UnauthorizedError('Please check the token you are sending')

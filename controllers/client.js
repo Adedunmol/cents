@@ -1,6 +1,7 @@
 const { StatusCodes } = require('http-status-codes')
 const { UnauthorizedError, BadRequestError } = require('../errors')
 const Client = require('../models/Client')
+const Invoice = require('../models/Invoice')
 
 
 const getAllClients = async (req, res) => {
@@ -48,9 +49,29 @@ const createClient = async (req, res) => {
     return res.status(StatusCodes.CREATED).json(result)
 }
 
+const deleteClient = async (req, res) => {
+    const createdBy = req.id
+    const { id: clientID } = req.params
+
+    console.log(`createdBy: ${createdBy}`)
+    console.log(`ClientID: ${clientID}`)
+    if (!clientID) {
+        throw new BadRequestError('No id with URL')
+    }
+
+    const invoices = await Invoice.findOneAndDelete({ createdBy, createdFor: clientID }).exec()
+    const client = await Client.findOneAndDelete({ createdBy, _id: clientID }).exec()
+
+    if (!client) {
+        return res.status(StatusCodes.NOT_FOUND).json({ message: 'No client with this Id' })
+    }
+
+    return res.status(StatusCodes.OK).json({ message: 'Client has been deleted' })
+}
 
 module.exports = {
     getClient,
     createClient,
-    getAllClients
+    getAllClients,
+    deleteClient
 }
