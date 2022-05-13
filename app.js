@@ -10,12 +10,12 @@ const cookieParser = require('cookie-parser')
 const notFoundMiddleware = require('./middlewares/route-not-found')
 const errorHandlerMiddleware = require('./middlewares/error-handler')
 const logger = require('./middlewares/logger')
-const verifyJWT = require('./middlewares/verifyJWT')
 const helmet = require('helmet')
 const rateLimiter = require('express-rate-limit')
 const cors = require('cors')
 const xss = require('xss-clean')
 const authRouter = require('./routes/auth')
+const { UnauthorizedError } = require('./errors')
 
 //connect to database
 connectDB(process.env.DATABASE_URI)
@@ -34,9 +34,9 @@ app.use(xss())
 
 app.use('/api/v1/auth', authRouter)
 
-app.use(verifyJWT)
+// app.use(verifyJWT)
 app.get('/', (req, res) => {
-    res.send('Testing')
+    throw new UnauthorizedError('Testing')
 })
 
 app.use(notFoundMiddleware)

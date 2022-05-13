@@ -4,6 +4,7 @@ const User = require('../models/User')
 const { BadRequestError, NotFound, UnauthorizedError, Forbidden } = require('../errors')
 const { StatusCodes } = require('http-status-codes')
 const ADMIN_LIST = require('../config/admin_list')
+const sendMail = require('../config/mail')
 
 
 const register = async (req, res) => {
@@ -21,6 +22,9 @@ const register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10)
 
+    //generate token for confirmation mail
+    const token = jwt.sign({ email }, process.env.SECRET_KEY, { expiresIn: '15m' })
+
     if (ADMIN_LIST.includes(email)) {
         const result = await User.create({
             fullName,
@@ -32,13 +36,28 @@ const register = async (req, res) => {
             },
             password: hashedPassword
         })
+
+        mailSubject = 'Confirmation Mail From Cents'
+        text = `Here is your confirmation link http://localhost:3000/api/v1/auth/confirm-mail/${token}`
+        html = `<p>Here is your confirmation link <a href=http://localhost:3000/api/v1/auth/confirm-mail/${token}> Confirm Mail </a> </p>`
+
+        sendMail(email, mailSubject, text, html)
+
         return res.status(StatusCodes.CREATED).json(result)
+
     }else {
         const result = await User.create({
             fullName,
             email,
             password: hashedPassword
         })
+
+        mailSubject = 'Confirmation Mail From Cents'
+        text = `Here is your confirmation link http://localhost:3000/api/v1/auth/confirm-mail/${token}`
+        html = `<p>Here is your confirmation link <a href=http://localhost:3000/api/v1/auth/confirm-mail/${token}> Confirm Mail </a> </p>`
+
+        sendMail(email, mailSubject, text, html)
+
         return res.status(StatusCodes.CREATED).json(result)
     }
 }
@@ -243,8 +262,115 @@ const changePassword = async (req, res) => {
 }
 
 
-const forgotPassword = async (req, res) => {
+const confirmMail = async (req, res) => {
+    const { token } = req.params
 
+    if (!token) {
+        throw new BadRequestError('No token with url')
+    }
+
+    jwt.verify(
+        token,
+        process.env.SECRET_KEY,
+        async (err, data) => {
+            if (err) {
+                return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Bad token' })
+            }
+            const username = data.username
+
+            const user = await User.findOne({ username }).exec()
+
+            if (!user) {
+                throw new UnauthorizedError('Please check the token you are sending')
+            }
+
+            if (user.confirmed) {
+                return res.status(StatusCodes.OK).json({ message: 'User already confirmed' })
+            }
+
+            user.confirmed = true
+            const result = await user.save()
+
+            return res.status(StatusCodes.OK).json({ message: 'User confirmed' })
+        }
+    )
+}
+
+
+const sendConfirmationMail = async (req, res) => {
+    const email = req.user
+
+    if (!email) {
+        throw new UnauthorizedError('You are not allowed to access this route')
+    }
+
+    const token = jwt.sign({ email }, process.env.SECRET_KEY, { expiresIn: '15m' })
+
+    mailSubject = 'Confirmation Mail From Cents'
+    text = `Here is your confirmation link http://localhost:3000/api/v1/auth/confirm-mail/${token}`
+    html = `<p>Here is your confirmation link <a href=http://localhost:3000/api/v1/auth/confirm-mail/${token}> Confirm Mail </a> </p>`
+
+    sendMail(email, mailSubject, text, html)
+
+    return res.status(StatusCodes.OK).json({ message: 'mail has been sent' })
+}
+
+
+const forgotPassword = async (req, res) => {
+    const { email } = req.body
+
+    if (!email) {
+        throw new BadRequestError('Body must include email')
+    }
+
+    const user = User.findOne({ email }).exec()
+
+    if (!user) {
+        throw new NotFound(`No user with email: ${email}`)
+    }
+
+    const token = jwt.sign({ email }, process.env.SECRET_KEY, { expiresIn: '15m' })
+
+    mailSubject = 'Forgot Mail From Cents'
+    text = `Here is your forgot password link http://localhost:3000/api/v1/auth/reset-password/${token}`
+    html = `<p>Here is your forgot password link <a href=http://localhost:3000/api/v1/auth/reset-password/${token}> Forgot Password </a> </p>`
+
+    sendMail(email, mailSubject, text, html)
+
+    return res.status(StatusCodes.OK).json({ message: 'mail has been sent' })
+}
+
+const resetPassword = async (req, res) => {
+    const { token } = req.params
+    const { password } = req.body
+
+    if (!token) {
+        throw new Forbidden('No token with URL')
+    }
+
+    jwt.verify(
+        token,
+        process.env.SECRET_KEY,
+        async (err, data) => {
+            if (err) {
+                throw new UnauthorizedError('Bad token')
+            }
+
+            const email = data.email
+            const user = await User.findOne({ email }).exec()
+
+            if (!user) {
+                throw new UnauthorizedError('No user with this email')
+            }
+
+            const hashedPassword = await bcrypt.hash(password, 10)
+            user.password = hashedPassword
+
+            const result = await user.save()
+
+            return res.status(StatusCodes.OK).json({ message: 'password has been reset' })
+        }
+    )
 }
 
 
@@ -254,5 +380,8 @@ module.exports = {
     refreshToken,
     logout,
     changePassword,
-    forgotPassword
+    forgotPassword,
+    confirmMail,
+    sendConfirmationMail,
+    resetPassword
 }

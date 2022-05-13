@@ -24,6 +24,10 @@ const UserSchema = new mongoose.Schema({
         Moderator: Number,
         Admin: Number
     },
+    confirmed: {
+        type: Boolean,
+        default: false
+    },
     refreshToken: [String]
 })
 
