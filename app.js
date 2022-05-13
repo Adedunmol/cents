@@ -14,7 +14,9 @@ const helmet = require('helmet')
 const rateLimiter = require('express-rate-limit')
 const cors = require('cors')
 const xss = require('xss-clean')
+const verifyJWT = require('./middlewares/verifyJWT')
 const authRouter = require('./routes/auth')
+const clientRouter = require('./routes/client')
 const { UnauthorizedError } = require('./errors')
 
 //connect to database
@@ -34,7 +36,9 @@ app.use(xss())
 
 app.use('/api/v1/auth', authRouter)
 
-// app.use(verifyJWT)
+app.use(verifyJWT)
+app.use('/api/v1/clients', clientRouter)
+
 app.get('/', (req, res) => {
     throw new UnauthorizedError('Testing')
 })

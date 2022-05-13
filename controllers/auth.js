@@ -137,7 +137,6 @@ const refreshToken = async (req, res) => {
     }
 
     const refreshToken = cookie.jwt
-    console.log(`cookie token: ${refreshToken}`)
     res.clearCookie('jwt', {maxAge: 24 * 60 * 60 * 1000, httpOnly: true, sameSite: 'None'})
 
     const user = await User.findOne({ refreshToken }).exec()
