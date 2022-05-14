@@ -18,6 +18,7 @@ const verifyJWT = require('./middlewares/verifyJWT')
 const verifyMailConfirmed = require('./middlewares/verifyMailConfirmed')
 const authRouter = require('./routes/auth')
 const clientRouter = require('./routes/client')
+const invoiceRouter = require('./routes/invoice')
 const { UnauthorizedError } = require('./errors')
 
 //connect to database

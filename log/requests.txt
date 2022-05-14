@@ -274,3 +274,23 @@ undefined: PATCH /api/v1/clients/627ea417361a963f3ac6d986
 
 undefined: PATCH /api/v1/clients/627ea417361a963f3ac6d986
 
+undefined: GET /api/v1/auth/refresh-token
+
+undefined: POST /api/v1/auth/login
+
+undefined: GET /api/v1/auth/refresh-token
+
+undefined: POST /api/v1/clients
+
+undefined: POST /api/v1/clients/627fffd069fb7e437ae4c5e9/invoices
+
+undefined: POST /api/v1/clients/627fffd069fb7e437ae4c5e9/invoices
+
+undefined: POST /api/v1/clients/627fffd069fb7e437ae4c5e9/invoices
+
+undefined: POST /api/v1/clients/627fffd069fb7e437ae4c5e9/invoices
+
+undefined: POST /api/v1/clients/627fffd069fb7e437ae4c5e9/invoices
+
+undefined: POST /api/v1/clients/627fffd069fb7e437ae4c5e9/invoices
+
