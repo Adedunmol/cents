@@ -8,8 +8,8 @@ const Events = require('events')
 const emailJobEvents = new Events()
 
 emailJobEvents.on('not-paid', (data) => {
-    const reminderEmailAfterDueDate = schedule.scheduleJob('*/2 * * * * *', () => {
-        const invoice = Invoice.findOne({ _id: data })
+    const reminderEmailAfterDueDate = schedule.scheduleJob('*/2 * * * * *', async () => {
+        const invoice = await Invoice.findOne({ _id: data }).exec()
         
         if (invoice.fullyPaid) {
             reminderEmailAfterDueDate.cancel()
@@ -48,8 +48,9 @@ const createInvoice = async (req, res) => {
     })
 
     const newDueDate = new Date(dueDate)
-    const sendMailOnDueDateJob = schedule.scheduleJob(newDueDate, () => {
-        const getInvoice = Invoice.findOne({ _id: invoice._id }).exec()
+    const sendMailOnDueDateJob = schedule.scheduleJob(newDueDate, async () => {
+        const getInvoice = await Invoice.findOne({ _id: invoice._id }).exec()
+        
         if (getInvoice.fullyPaid) {
             sendMailOnDueDateJob.cancel()
         }
