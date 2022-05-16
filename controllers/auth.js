@@ -121,7 +121,7 @@ const login = async (req, res) => {
         const result = await user.save()
 
         res.cookie('jwt', newRefreshToken, { maxAge: 24 * 60 * 60 * 1000, httpOnly: true, sameSite: 'None' })
-        return res.status(StatusCodes.OK).json({ accessToken })
+        return res.status(StatusCodes.OK).json({ accessToken, expiresIn: 15 * 60 * 1000 })
     }
 
     throw new UnauthorizedError('Invalid credentials')
@@ -163,7 +163,6 @@ const refreshToken = async (req, res) => {
         throw new UnauthorizedError('Token reuse')
     }
 
-    console.log(user)
     let newRefreshTokenArray = user.refreshToken.filter(token => token !== refreshToken)
 
     jwt.verify(
@@ -206,7 +205,7 @@ const refreshToken = async (req, res) => {
 
             res.cookie('jwt', newRefreshToken, {maxAge: 24 * 60 * 60 * 1000, httpOnly: true, sameSite: 'None'})
 
-            return res.status(StatusCodes.OK).json({ accessToken })
+            return res.status(StatusCodes.OK).json({ accessToken, expiresIn: 15 * 60 * 1000 })
         }
     )
 }

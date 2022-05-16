@@ -41,6 +41,8 @@ app.use('/api/v1/auth', authRouter)
 app.use(verifyJWT)
 app.use(verifyMailConfirmed)
 app.use('/api/v1/clients', clientRouter)
+app.use('/api/v1/invoices', invoiceRouter)
+
 
 app.get('/', (req, res) => {
     throw new UnauthorizedError('Testing')
