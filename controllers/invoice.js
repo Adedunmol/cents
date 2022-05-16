@@ -127,6 +127,33 @@ const getAllInvoices = async (req, res) => {
 }
 
 
+const editInvoice = async (req, res) => {
+    const { id: clientId, invoiceId } = req.params
+    const createdBy = req.id
+    const {} = req.body
+
+    const update = {}
+
+    if (!clientId) {
+        throw new BadRequestError('ClientId is not included with url')
+    }
+
+    const client = await Client.findOne({ _id: clientId }).exec()
+
+    if (!client) {
+        throw new NotFound('No client with this id')
+    }
+
+    const invoice = await Invoice.findOneAndUpdate({ _id: invoiceId, createdFor: client._id, createdBy }).exec()
+
+    if (!invoice) {
+        throw new NotFound('No invoice found with this id')
+    }
+
+    return res.status(StatusCodes.OK).json({ invoice })
+}
+
+
 module.exports = {
     createInvoice,
     getInvoice,

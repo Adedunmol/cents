@@ -41,5 +41,7 @@ const InvoiceSchema = new mongoose.Schema({
 }, {timestamps: true})
 
 
+//mongoose pre save middleware
+
 
 module.exports = mongoose.model('Invoice', InvoiceSchema)
