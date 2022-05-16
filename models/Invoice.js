@@ -42,6 +42,17 @@ const InvoiceSchema = new mongoose.Schema({
 
 
 //mongoose pre save middleware
+//this checks if all the services have been paid for and sets the invoice fullyPaid to be true
+//not working yet
+InvoiceSchema.pre('updateOne', async function() {
+
+    console.log(this)
+    result = this.services.filter(service => service.paid !== true)
+    console.log(result)
+    // if (result.length < 1) {
+    //     this.fullyPaid = true 
+    // }
+})
 
 
 module.exports = mongoose.model('Invoice', InvoiceSchema)

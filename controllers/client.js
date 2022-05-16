@@ -99,7 +99,7 @@ const updateClient = async (req, res) => {
         const invoiceResult = await newInvoices.save()
     }
 
-    return res.status(StatusCodes.OK).json(clientResult)
+    return res.status(StatusCodes.OK).json({ client: clientResult })
 }
 
 

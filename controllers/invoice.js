@@ -8,18 +8,22 @@ const Events = require('events')
 const emailJobEvents = new Events()
 
 emailJobEvents.on('not-paid', (data) => {
+    //change the cron expression to run once a week
     const reminderEmailAfterDueDate = schedule.scheduleJob('*/2 * * * * *', async () => {
         const invoice = await Invoice.findOne({ _id: data }).exec()
         
+        console.log(invoice.fullyPaid)
         if (invoice.fullyPaid) {
             reminderEmailAfterDueDate.cancel()
         }
+
+        //this is going to be sending mails to the client 
         console.log('invoice not paid', data)
     })
 })
 
 
-const mailScheduleOnDueDate = async (dueDate) => {
+const mailScheduleOnDueDate = async (invoice, dueDate) => {
     
     //going to use format function from date-fns to format the date
     const newDueDate = new Date(dueDate)
@@ -66,7 +70,7 @@ const createInvoice = async (req, res) => {
         createdFor: clientId
     })
 
-    mailScheduleOnDueDate(dueDate)
+    mailScheduleOnDueDate(invoice, dueDate)
 
     return res.status(StatusCodes.CREATED).json(invoice)
 }
@@ -127,12 +131,10 @@ const getAllInvoices = async (req, res) => {
 }
 
 
-const editInvoice = async (req, res) => {
+const updateInvoice = async (req, res) => {
     const { id: clientId, invoiceId } = req.params
     const createdBy = req.id
-    const {} = req.body
-
-    const update = {}
+    
 
     if (!clientId) {
         throw new BadRequestError('ClientId is not included with url')
@@ -144,7 +146,10 @@ const editInvoice = async (req, res) => {
         throw new NotFound('No client with this id')
     }
 
-    const invoice = await Invoice.findOneAndUpdate({ _id: invoiceId, createdFor: client._id, createdBy }).exec()
+    const invoice = await Invoice.findOneAndUpdate({ _id: invoiceId, createdFor: client._id, createdBy }, req.body, {
+        new: true,
+        runValidators: true
+    }).exec()
 
     if (!invoice) {
         throw new NotFound('No invoice found with this id')
@@ -158,5 +163,6 @@ module.exports = {
     createInvoice,
     getInvoice,
     getClientInvoices,
-    getAllInvoices
+    getAllInvoices,
+    updateInvoice
 }
