@@ -1,11 +1,14 @@
 const { BadRequestError, NotFound } = require('../errors')
 const Client = require('../models/Client')
 const Invoice = require('../models/Invoice')
+const User = require('../models/User')
 const schedule = require('node-schedule')
 const { StatusCodes } = require('http-status-codes')
 const path = require('path')
+const sendMail = require('../config/mail')
 const generateInvoice = require('../utils/generateInvoice')
 const Events = require('events')
+const fs = require('fs')
 
 const emailJobEvents = new Events()
 
@@ -38,10 +41,26 @@ const mailScheduleOnDueDate = async (invoice, dueDate) => {
             sendMailOnDueDateJob.cancel()
         }
 
-        emailJobEvents.emit('not-paid', invoice._id)
-        generateInvoice(invoiceData, path.join(__dirname, '..', 'invoices', `${invoice._id}.pdf`))
+        const user = await User.findOne({ _id : invoiceData.createdBy }).exec()
+
+        emailJobEvents.emit('not-paid', invoiceData._id)
+        await generateInvoice(invoiceData, path.join(__dirname, '..', 'invoices', `${invoiceData._id}.pdf`))
+        
         //sending the invoice to the client here
+        console.log('invoice has been sent')
+        subject = `An invoice for the contract for ${user.fullName}`
+        text = `Please check the invoice below:`
+        html = `<p> Please check the invoice below: </p>`
+        sendMail(invoiceData.clientEmail, subject, text, html, invoice)
+        console.log('invoice has been sent')
+
         //the invoice pdf is to be deleted from the invoices directory after sending to the client
+        const filePath = path.join(__dirname, '..', 'invoices', `${invoiceData._id}.pdf`)
+        console.log(fs.existsSync(filePath))
+        fs.unlink(filePath, (err) => {
+            if (err) throw err
+            console.log('file has been deleted')
+        })
     })
 }
 
@@ -59,7 +78,7 @@ const createInvoice = async (req, res) => {
         throw new BadRequestError('ClientId is not included with url')
     }
 
-    const client = await Client.findOne({ clientId }).exec()
+    const client = await Client.findOne({ _id: clientId }).exec()
 
     if (!client) {
         throw new BadRequestError('No client with this id')
@@ -176,6 +195,8 @@ const sendInvoiceToClient = async (req, res) => {
 
     const invoice = await Invoice.findOne({ _id: invoiceId }).exec()
 
+    const user = await User.findOne({ _id: invoice.createdBy }).exec()
+
     if (!invoice) {
         throw new NotFound('No invoice with this id')
     }
@@ -183,7 +204,13 @@ const sendInvoiceToClient = async (req, res) => {
     generateInvoice(invoice, path.join(__dirname, '..', 'invoices', `${invoice._id}.pdf`))
     
     //send invoice as mail to the client here
+    subject = `An invoice for the contract for ${user.fullName}`
+    text = `Please check the invoice below:`
+    html = `<p> Please check the invoice below: </p>`
+    sendMail(invoice.clientEmail, subject, text, html, invoice)
+
     //delete the invoice from the invoices directory
+    fs.unlink(path.join(__dirname, '..', 'invoices', `${String(invoice._id)}.pdf`))
 
     return res.status(StatusCodes.OK).json({ message: 'The Invoice has been sent to the client' })
 }

@@ -1,12 +1,13 @@
 const { google } = require('googleapis')
 const nodemailer = require('nodemailer')
+require('dotenv').config()
 const path = require('path')
 
 const oAuth2Client = new google.auth.OAuth2(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET, process.env.GOOGLE_REDIRECT_URI)
 
 oAuth2Client.setCredentials({refresh_token: process.env.GOOGLE_REFRESH_TOKEN})
 
-const sendMail = async (to, subject, text, html, invoice) => {
+const sendMail = async (to, subject, text, html, attachment) => {
     
     const googleAccessToken = oAuth2Client.getAccessToken()
 
@@ -28,9 +29,9 @@ const sendMail = async (to, subject, text, html, invoice) => {
         subject: subject,
         text: text,
         html: html,
-        attachments: invoice ? [{
-            filename: `${String(invoice._id)}.pdf`,
-            path: path.join(__dirname, '..', 'invoices', `${String(invoice._id)}.pdf`),
+        attachments: attachment ? [{
+            filename: '6284769754440686c85efd66.pdf',
+            path: path.join(__dirname, 'invoices', '6284769754440686c85efd66.pdf'),
             contentType: 'application/pdf'
         }] : ''
     }
@@ -40,4 +41,4 @@ const sendMail = async (to, subject, text, html, invoice) => {
 }
 
 
-module.exports = sendMail
+sendMail('oyewaleadedunmola@gmail.com', 'testing pdf', 'Check out the invoice', '<p>Check out the invoice</p>')
