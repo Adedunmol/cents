@@ -3,9 +3,12 @@ const Client = require('../models/Client')
 const Invoice = require('../models/Invoice')
 const schedule = require('node-schedule')
 const { StatusCodes } = require('http-status-codes')
+const path = require('path')
+const generateInvoice = require('../utils/generateInvoice')
 const Events = require('events')
 
 const emailJobEvents = new Events()
+
 
 emailJobEvents.on('not-paid', (data) => {
     //change the cron expression to run once a week
@@ -28,16 +31,16 @@ const mailScheduleOnDueDate = async (invoice, dueDate) => {
     //going to use format function from date-fns to format the date
     const newDueDate = new Date(dueDate)
     const sendMailOnDueDateJob = schedule.scheduleJob(newDueDate, async () => {
-        const getInvoice = await Invoice.findOne({ _id: invoice._id }).exec()
+        const invoiceData = await Invoice.findOne({ _id: invoice._id }).exec()
         
-        if (getInvoice.fullyPaid) {
+        if (invoiceData.fullyPaid) {
             sendMailOnDueDateJob.cancel()
         }
 
         emailJobEvents.emit('not-paid', invoice._id)
-        console.log('Sending reminder Mail')
+        generateInvoice(invoiceData, path.join(__dirname, '..', 'invoices', `${invoice._id}.pdf`))
+        //sending the invoice to the client here
     })
-
 }
 
 
@@ -60,6 +63,8 @@ const createInvoice = async (req, res) => {
         throw new BadRequestError('No client with this id')
     }
 
+    const total = services.reduce((current, obj) => current + Math.floor(obj.rate * obj.hours), 0)
+
     const invoice = await Invoice.create({
         clientFullName: client.fullName,
         clientEmail: client.email,
@@ -67,7 +72,8 @@ const createInvoice = async (req, res) => {
         services: services,
         dueDate: dueDate,
         createdBy,
-        createdFor: clientId
+        createdFor: clientId,
+        total
     })
 
     mailScheduleOnDueDate(invoice, dueDate)
@@ -159,10 +165,16 @@ const updateInvoice = async (req, res) => {
 }
 
 
+const sendInvoiceToClient = async (req, res) => {
+
+}
+
+
 module.exports = {
     createInvoice,
     getInvoice,
     getClientInvoices,
     getAllInvoices,
-    updateInvoice
+    updateInvoice,
+    sendInvoiceToClient
 }

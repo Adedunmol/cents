@@ -23,6 +23,9 @@ const InvoiceSchema = new mongoose.Schema({
             default: false
         }
     }],
+    total: {
+        type: Number
+    },
     dueDate: Date,
     fullyPaid: {
         type: Boolean,
