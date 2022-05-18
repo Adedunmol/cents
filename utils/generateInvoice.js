@@ -120,11 +120,11 @@ function generateInvoiceTable(doc, invoice) {
       generateHr(doc, position + 20);
     }
   
-    const duePosition = (invoiceTableTop + (i + 1) * 30) + 25;
+    const totalPosition = (invoiceTableTop + (i + 1) * 30) + 15 //25;
     doc.font("Helvetica-Bold");
     generateTableRow(
       doc,
-      duePosition,
+      totalPosition,
       "",
       "Total:",
       "",

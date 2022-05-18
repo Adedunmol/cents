@@ -21,6 +21,7 @@ emailJobEvents.on('not-paid', (data) => {
         }
 
         //this is going to be sending mails to the client 
+        //the invoice pdf is going to be deleted from the invoices directory after sending to the client 
         console.log('invoice not paid', data)
     })
 })
@@ -40,6 +41,7 @@ const mailScheduleOnDueDate = async (invoice, dueDate) => {
         emailJobEvents.emit('not-paid', invoice._id)
         generateInvoice(invoiceData, path.join(__dirname, '..', 'invoices', `${invoice._id}.pdf`))
         //sending the invoice to the client here
+        //the invoice pdf is to be deleted from the invoices directory after sending to the client
     })
 }
 
@@ -166,7 +168,24 @@ const updateInvoice = async (req, res) => {
 
 
 const sendInvoiceToClient = async (req, res) => {
+    const { id: invoiceId } = req.params
 
+    if (!clientId) {
+        throw new BadRequestError('No invoice id with url')
+    }
+
+    const invoice = await Invoice.findOne({ _id: invoiceId }).exec()
+
+    if (!invoice) {
+        throw new NotFound('No invoice with this id')
+    }
+
+    generateInvoice(invoice, path.join(__dirname, '..', 'invoices', `${invoice._id}.pdf`))
+    
+    //send invoice as mail to the client here
+    //delete the invoice from the invoices directory
+
+    return res.status(StatusCodes.OK).json({ message: 'The Invoice has been sent to the client' })
 }
 
 
