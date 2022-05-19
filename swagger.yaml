@@ -5,7 +5,7 @@ info:
   contact: {}
   version: '1.0'
 servers:
-- url: https://cents-api.herokuapp.com//api/v1
+- url: https://cents-api.herokuapp.com/api/v1
   variables: {}
 - url: http://example.com
   variables: {}
