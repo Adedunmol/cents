@@ -25,7 +25,7 @@ const { StatusCodes } = require('http-status-codes')
 
 const swaggerUI = require('swagger-ui-express')
 const YAML = require('yamljs')
-const swaggerDocument = require('./swagger.yaml')
+const swaggerDocument = YAML.load('./swagger.yaml')
 
 //connect to database
 connectDB(process.env.DATABASE_URI)
