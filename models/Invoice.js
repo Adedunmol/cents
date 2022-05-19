@@ -46,15 +46,14 @@ const InvoiceSchema = new mongoose.Schema({
 
 //mongoose pre save middleware
 //this checks if all the services have been paid for and sets the invoice fullyPaid to be true
-//not working yet
-InvoiceSchema.pre('updateOne', async function() {
+InvoiceSchema.pre('save', async function() {
 
-    console.log(this)
-    result = this.services.filter(service => service.paid !== true)
-    console.log(result)
-    // if (result.length < 1) {
-    //     this.fullyPaid = true 
-    // }
+    result = this.services.filter(service => service.paid !== true)    
+    
+    if (!result || result.length < 1) {
+         this.fullyPaid = true 
+    }
+    
 })
 
 

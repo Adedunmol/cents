@@ -2,13 +2,10 @@ const { BadRequestError, NotFound } = require('../errors')
 const Client = require('../models/Client')
 const Invoice = require('../models/Invoice')
 const User = require('../models/User')
-const schedule = require('node-schedule')
 const { StatusCodes } = require('http-status-codes')
 const path = require('path')
 const sendMail = require('../config/mail')
 const generateInvoice = require('../utils/generateInvoice')
-const Events = require('events')
-const fs = require('fs')
 const mailScheduleOnDueDate = require('../events/reminderMail')
 
 
@@ -108,7 +105,8 @@ const getAllInvoices = async (req, res) => {
 const updateInvoice = async (req, res) => {
     const { id: clientId, invoiceId } = req.params
     const createdBy = req.id
-    
+    const { services, fullyPaid, dueDate } = req.body
+
 
     if (!clientId) {
         throw new BadRequestError('ClientId is not included with url')
@@ -120,16 +118,19 @@ const updateInvoice = async (req, res) => {
         throw new NotFound('No client with this id')
     }
 
-    const invoice = await Invoice.findOneAndUpdate({ _id: invoiceId, createdFor: client._id, createdBy }, req.body, {
-        new: true,
-        runValidators: true
-    }).exec()
+    const invoice = await Invoice.findOne({ _id: invoiceId, createdFor: client._id, createdBy }).exec()
 
     if (!invoice) {
         throw new NotFound('No invoice found with this id')
     }
 
-    return res.status(StatusCodes.OK).json({ invoice })
+    invoice.services = services || invoice.services
+    invoice.fullyPaid = fullyPaid || invoice.fullyPaid
+    invoice.dueDate = new Date(dueDate) || invoice.dueDate
+
+    const result = await invoice.save()
+
+    return res.status(StatusCodes.OK).json({ invoice: result })
 }
 
 

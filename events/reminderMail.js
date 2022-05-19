@@ -2,6 +2,8 @@ const sendMail = require('../config/mail')
 const generateInvoice = require('../utils/generateInvoice')
 const Events = require('events')
 const fs = require('fs')
+const schedule = require('node-schedule')
+
 
 const emailJobEvents = new Events()
 
