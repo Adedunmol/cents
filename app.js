@@ -21,6 +21,7 @@ const userRouter = require('./routes/user')
 const clientRouter = require('./routes/client')
 const invoiceRouter = require('./routes/invoice')
 const { UnauthorizedError } = require('./errors')
+const { StatusCodes } = require('http-status-codes')
 
 //connect to database
 connectDB(process.env.DATABASE_URI)
@@ -37,6 +38,12 @@ app.use(helmet())
 app.use(cors())
 app.use(xss())
 
+
+app.get('/', (req, res) => {
+    return res.status(StatusCodes.OK).send('<h1>Cents API</h1>')
+})
+
+
 app.use('/api/v1/auth', authRouter)
 
 app.use(verifyJWT)
@@ -45,10 +52,6 @@ app.use('/api/v1/users/', userRouter)
 app.use('/api/v1/clients', clientRouter)
 app.use('/api/v1/invoices', invoiceRouter)
 
-
-app.get('/', (req, res) => {
-    throw new UnauthorizedError('Testing')
-})
 
 app.use(notFoundMiddleware)
 app.use(errorHandlerMiddleware)
