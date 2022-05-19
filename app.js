@@ -23,6 +23,10 @@ const invoiceRouter = require('./routes/invoice')
 const { UnauthorizedError } = require('./errors')
 const { StatusCodes } = require('http-status-codes')
 
+const swaggerUI = require('swagger-ui-express')
+const YAML = require('yamljs')
+const swaggerDocument = require('./swagger.yaml')
+
 //connect to database
 connectDB(process.env.DATABASE_URI)
 
@@ -38,9 +42,13 @@ app.use(helmet())
 app.use(cors())
 app.use(xss())
 
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument))
 
 app.get('/', (req, res) => {
-    return res.status(StatusCodes.OK).send('<h1>Cents API</h1>')
+    return res.status(StatusCodes.OK).send(`
+        <h1>Cents API</h1>
+        <a href="/api-docs">Documentation</a>
+        `)
 })
 
 

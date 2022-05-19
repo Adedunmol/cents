@@ -1,0 +1,735 @@
+openapi: 3.0.0
+info:
+  title: CENTS
+  description: An API for invoice and payment reminding for freelancers.
+  contact: {}
+  version: '1.0'
+servers:
+- url: https://cents-api.herokuapp.com//api/v1
+  variables: {}
+- url: http://example.com
+  variables: {}
+paths:
+  /auth/register:
+    post:
+      tags:
+      - Auth
+      summary: Register User
+      operationId: RegisterUser
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterUserRequest'
+            example:
+              fullName: John Doe
+              email: johndoe@gmail.com
+              password: testing123
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security: []
+      servers:
+      - url: http://example.com
+        variables: {}
+  /auth/login:
+    post:
+      tags:
+      - Auth
+      summary: Login User
+      operationId: LoginUser
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginUserRequest'
+            example:
+              email: johndoe@gmail.com
+              password: testing123
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security: []
+      servers:
+      - url: http://example.com
+        variables: {}
+  /auth/refresh-token:
+    get:
+      tags:
+      - Auth
+      summary: Get New Access Token
+      description: It requires a cookie from the API set on the client side.
+      operationId: GetNewAccessToken
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: http://example.com
+        variables: {}
+  /auth/logout:
+    get:
+      tags:
+      - Auth
+      summary: Logout User
+      operationId: LogoutUser
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: http://example.com
+        variables: {}
+  /auth/change-password:
+    patch:
+      tags:
+      - Auth
+      summary: Change Password
+      operationId: ChangePassword
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+            example:
+              oldPassword: testing123
+              newPassword: testing1234
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: http://example.com
+        variables: {}
+  /auth/confirm-mail/{token}:
+    get:
+      tags:
+      - Auth
+      summary: Confirm User Email
+      description: This route verifies the email of the user.
+      operationId: ConfirmUserEmail
+      parameters:
+        - in: path
+          name: token   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Token sent to the email of the user 
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security: []
+      servers:
+      - url: https://cents-api.herokuapp.com//api/v1
+        variables: {}
+  /auth/resend-confirmation-mail:
+    get:
+      tags:
+      - Auth
+      summary: Send New Confirmation Mail
+      operationId: SendNewConfirmationMail
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: http://example.com
+        variables: {}
+  /auth/forgot-password:
+    post:
+      tags:
+      - Auth
+      summary: Forgot Password
+      operationId: ForgotPassword
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+            example:
+              email: johndoe@gmail.com
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security: []
+      servers:
+      - url: http://example.com
+        variables: {}
+  /auth/reset-password/{token}:
+   patch:
+      tags:
+      - Auth
+      summary: Reset Password
+      operationId: ResetPassword
+      parameters:
+        - in: path
+          name: token   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Token sent to the email of the user
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+            example:
+              password: testing123
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      servers:
+      - url: https://cents-api.herokuapp.com//api/v1
+        variables: {}
+  /clients:
+    post:
+      tags:
+      - Clients
+      summary: Create New Client
+      operationId: CreateNewClient
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateNewClientRequest'
+            example:
+              fullName: Client
+              email: client@gmail.com
+              phoneNumber: 1234567890
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: http://example.com
+        variables: {}
+    get:
+      tags:
+      - Clients
+      summary: Get Clients
+      operationId: GetClients
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: http://example.com
+        variables: {}
+        
+  /clients/{clientId}:
+    parameters:
+        - in: path
+          name: clientId
+          schema:
+            type: integer
+          required: true
+          description: The client ID
+    get:
+      tags:
+      - Clients
+      summary: Get A Client
+      operationId: GetAClient
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: http://example.com
+        variables: {}
+    delete:
+      tags:
+      - Clients
+      summary: Delete Client
+      operationId: DeleteClient
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: http://example.com
+        variables: {}
+  
+    patch:
+      tags:
+      - Clients
+      summary: Update Client
+      operationId: UpdateClient
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateClientRequest'
+            example:
+              email: newclient1@gmail.com
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: http://example.com
+        variables: {}
+        
+  /clients/{clientId}/invoices:
+    post:
+      tags:
+      - Invoices
+      summary: Create A New Invoice
+      operationId: CreateANewInvoice
+      parameters:
+        - in: path
+          name: clientId
+          schema:
+            type: string
+          required: true
+          description: The client ID
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateANewInvoiceRequest'
+            example:
+              services:
+              - item: milestone 1
+                rate: '10'
+                hours: '4'
+              - item: milestone 2
+                rate: '20'
+                hours: '6'
+              dueDate: 2022-05-18
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: http://example.com
+        variables: {}
+    
+    get:
+      tags:
+      - Invoices
+      summary: Get Client's Invoices
+      operationId: GetClient'sInvoices
+      parameters:
+        - in: path
+          name: clientId
+          schema:
+            type: string
+          required: true
+          description: The client ID
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: http://example.com
+        variables: {}
+    
+  /clients/{clientId}/invoices/{invoiceId}:
+    get:
+      tags:
+      - Invoices
+      summary: Get An Invoice For A Client
+      operationId: GetAnInvoiceForAClient
+      parameters:
+        - in: path
+          name: clientId
+          schema:
+            type: string
+          required: true
+          description: The client ID
+        - in: path
+          name: invoiceId
+          schema:
+            type: string
+          required: true
+          description: The invoice ID
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: http://example.com
+        variables: {}
+  
+  
+    patch:
+      tags:
+      - Invoices
+      summary: Update An Invoice
+      operationId: UpdateAnInvoice
+      parameters:
+        - in: path
+          name: clientId
+          schema:
+            type: string
+          required: true
+          description: The client ID
+        - in: path
+          name: invoiceId
+          schema:
+            type: string
+          required: true
+          description: The invoice ID
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAnInvoiceRequest'
+            example:
+              services:
+              - item: milestone 1
+                rate: '30'
+                hours: '4'
+                paid: true
+              - item: milestone 2
+                rate: '20'
+                hours: '6'
+                paid: true
+              fullyPaid: true
+              dueDate: 2022-05-16T15:35
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: http://example.com
+        variables: {}
+        
+  /invoices:
+    get:
+      tags:
+      - Invoices
+      summary: Get All Invoices
+      operationId: GetAllInvoices
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: http://example.com
+        variables: {}
+        
+  /users/update:
+    patch:
+      tags:
+      - Users
+      summary: Update User Info
+      operationId: UpdateUserInfo
+      parameters: []
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserInfoRequest'
+            example:
+              fullName: John Doe
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+      servers:
+      - url: http://example.com
+        variables: {}
+components:
+  schemas:
+    RegisterUserRequest:
+      title: RegisterUserRequest
+      required:
+      - fullName
+      - email
+      - password
+      type: object
+      properties:
+        fullName:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+      example:
+        fullName: John Doe
+        email: johndoe@gmail.com
+        password: testing123
+    LoginUserRequest:
+      title: LoginUserRequest
+      required:
+      - email
+      - password
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      example:
+        email: johndoe@gmail.com
+        password: testing123
+    ChangePasswordRequest:
+      title: ChangePasswordRequest
+      required:
+      - oldPassword
+      - newPassword
+      type: object
+      properties:
+        oldPassword:
+          type: string
+        newPassword:
+          type: string
+      example:
+        oldPassword: testing123
+        newPassword: testing1234
+    ForgotPasswordRequest:
+      title: ForgotPasswordRequest
+      required:
+      - email
+      type: object
+      properties:
+        email:
+          type: string
+      example:
+        email: johndoe@gmail.com
+    ResetPasswordRequest:
+      title: ResetPasswordRequest
+      required:
+      - password
+      type: object
+      properties:
+        password:
+          type: string
+      example:
+        password: testing123
+    CreateNewClientRequest:
+      title: CreateNewClientRequest
+      required:
+      - fullName
+      - email
+      - phoneNumber
+      type: object
+      properties:
+        fullName:
+          type: string
+        email:
+          type: string
+        phoneNumber:
+          type: integer
+          format: int32
+      example:
+        fullName: Client
+        email: client@gmail.com
+        phoneNumber: 1234567890
+    UpdateClientRequest:
+      title: UpdateClientRequest
+      required:
+      - email
+      type: object
+      properties:
+        email:
+          type: string
+      example:
+        email: newclient1@gmail.com
+    CreateANewInvoiceRequest:
+      title: CreateANewInvoiceRequest
+      required:
+      - services
+      - dueDate
+      type: object
+      properties:
+        services:
+          type: array
+          items:
+            $ref: '#/components/schemas/Service'
+          description: ''
+        dueDate:
+          type: string
+      example:
+        services:
+        - item: milestone 1
+          rate: '10'
+          hours: '4'
+        - item: milestone 2
+          rate: '20'
+          hours: '6'
+        dueDate: 2022-05-18
+    Service:
+      title: Service
+      required:
+      - item
+      - rate
+      - hours
+      type: object
+      properties:
+        item:
+          type: string
+        rate:
+          type: string
+        hours:
+          type: string
+      example:
+        item: milestone 1
+        rate: '10'
+        hours: '4'
+    UpdateAnInvoiceRequest:
+      title: UpdateAnInvoiceRequest
+      required:
+      - services
+      - fullyPaid
+      - dueDate
+      type: object
+      properties:
+        services:
+          type: array
+          items:
+            $ref: '#/components/schemas/Service1'
+          description: ''
+        fullyPaid:
+          type: boolean
+        dueDate:
+          type: string
+      example:
+        services:
+        - item: milestone 1
+          rate: '30'
+          hours: '4'
+          paid: true
+        - item: milestone 2
+          rate: '20'
+          hours: '6'
+          paid: true
+        fullyPaid: true
+        dueDate: 2022-05-16T15:35
+    Service1:
+      title: Service1
+      required:
+      - item
+      - rate
+      - hours
+      - paid
+      type: object
+      properties:
+        item:
+          type: string
+        rate:
+          type: string
+        hours:
+          type: string
+        paid:
+          type: boolean
+      example:
+        item: milestone 1
+        rate: '30'
+        hours: '4'
+        paid: true
+    UpdateUserInfoRequest:
+      title: UpdateUserInfoRequest
+      required:
+      - fullName
+      type: object
+      properties:
+        fullName:
+          type: string
+      example:
+        fullName: John Doe
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+security: []
+tags:
+- name: Auth
+  description: ''
+- name: Clients
+  description: ''
+- name: Invoices
+  description: ''
+- name: Users
+  description: ''
