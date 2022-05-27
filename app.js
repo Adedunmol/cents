@@ -20,12 +20,24 @@ const authRouter = require('./routes/auth')
 const userRouter = require('./routes/user')
 const clientRouter = require('./routes/client')
 const invoiceRouter = require('./routes/invoice')
-const { UnauthorizedError } = require('./errors')
+const schedule = require('./jobs/scheduler')
 const { StatusCodes } = require('http-status-codes')
-
+const emailJobEvents = require('./events')
 const swaggerUI = require('swagger-ui-express')
 const YAML = require('yamljs')
 const swaggerDocument = YAML.load('./swagger.yaml')
+
+
+emailJobEvents.on('send-reminder-mails', async (data) => {
+    await schedule.reminderMails(data)
+})
+
+
+emailJobEvents.on('dueMail', async (data) => {
+    await schedule.dueDateMail(data.invoice, data.dueDate)
+})
+
+app.set('emailJobEvents', emailJobEvents)
 
 //connect to database
 connectDB(process.env.DATABASE_URI)
@@ -34,6 +46,7 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(logger('requests.txt'))
 
+app.set('trust proxy', 1)
 app.use(rateLimiter({
     windowMs: 5 * 60 * 60 * 1000,
     max: 100 
@@ -68,7 +81,7 @@ app.use(errorHandlerMiddleware)
 const PORT = process.env.PORT || 3000
 
 
-mongoose.connection.once('open', () => {
+mongoose.connection.once('open', async () => {
     console.log('Connected to Database')
     app.listen(PORT, console.log(`Server is listening on port ${PORT}`))
 })

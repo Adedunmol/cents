@@ -5,11 +5,16 @@ const User = require('../models/User')
 const { StatusCodes } = require('http-status-codes')
 const path = require('path')
 const sendMail = require('../config/mail')
+const emailJobEvents = require('../events')
 const generateInvoice = require('../utils/generateInvoice')
-const mailScheduleOnDueDate = require('../events/reminderMail')
+const { dateDiffInDays, findSecondsDifference } = require('../utils/differenceInDates')
+//const schedule = require('../jobs/schedulers/schedule')
+//const mailScheduleOnDueDate = require('../events/reminderMail')
 
 
 const createInvoice = async (req, res) => {
+    const emailJobEvents = req.app.get('emailJobEvents')
+
     const { id: clientId } = req.params
     const createdBy = req.id
     const { services, dueDate } = req.body
@@ -30,18 +35,26 @@ const createInvoice = async (req, res) => {
 
     const total = services.reduce((current, obj) => current + Math.floor(obj.rate * obj.hours), 0)
 
+    const newDueDate = new Date(dueDate)
+
+    console.log(`Current date: ${new Date()}`)
+    const interval = dateDiffInDays(new Date(), newDueDate) > 0 ? `${dateDiffInDays(new Date(), newDueDate)} days` : `${findSecondsDifference(new Date(), newDueDate)} seconds`
+    console.log(`${interval}`)
+    
     const invoice = await Invoice.create({
         clientFullName: client.fullName,
         clientEmail: client.email,
         clientPhoneNumber: client.phoneNumber,
         services: services,
-        dueDate: dueDate,
+        dueDate: newDueDate,
         createdBy,
         createdFor: clientId,
         total
     })
 
-    mailScheduleOnDueDate(invoice, dueDate)
+    //mailScheduleOnDueDate(invoice, dueDate)
+    //schedule.dueDateMail(invoice, dueDate)
+    emailJobEvents.emit('dueMail', { invoice, dueDate })
 
     return res.status(StatusCodes.CREATED).json(invoice)
 }
@@ -149,7 +162,7 @@ const sendInvoiceToClient = async (req, res) => {
         throw new NotFound('No invoice with this id')
     }
 
-    await generateInvoice(invoice, path.join(__dirname, '..', 'invoices', `${invoice._id}.pdf`))
+    generateInvoice(invoice, path.join(__dirname, '..', 'invoices', `${invoice._id}.pdf`))
     
     //send invoice as mail to the client here
     subject = `An invoice for the contract for ${user.fullName}`
